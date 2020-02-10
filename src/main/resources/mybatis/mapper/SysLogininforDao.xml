@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sysLogininforDao">
+
+
+	<insert id="insertLogininfor" parameterType="com.syn.smsp.vo.SysLogininforVO">
+		insert into sys_logininfor (
+				login_name,
+				dept_id,
+				status,
+				ipaddr,
+				login_location,
+				browser,
+				os,
+				msg,
+				login_time
+		)values (
+				#{loginName},
+				#{deptId},
+				#{status},
+				#{ipaddr},
+				#{loginLocation},
+				#{browser},
+				#{os},
+				#{msg},
+				sysdate()
+			)
+		</insert>
+	
+	<select id="selectLogininforList" resultType="com.syn.smsp.vo.SysLogininforVO">
+		select info_id,login_name,dept_id,
+		(SELECT t.dept_name from sys_dept t where t.dept_id = c.dept_id) as dept_name,
+		ipaddr,login_location,browser,os,status,msg,login_time from sys_logininfor c
+		<where>
+			<if test="deptId != null and deptId != 0">
+				AND (c.dept_id = #{deptId} or c.dept_id in (SELECT t.dept_id FROM sys_dept t where t.parent_id = #{deptId}))
+			</if>
+			<if test="ipaddr != null and ipaddr.trim() != ''">
+				AND c.ipaddr like concat('%', #{ipaddr}, '%')
+			</if>
+			<if test="status != null and status != ''">
+				AND c.status = #{status}
+			</if>
+			<if test="loginName != null and loginName.trim() != ''">
+				AND c.login_name like concat('%', #{loginName}, '%')
+			</if>
+			<if test="params != null and params.size() > 0">
+				<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+					and date_format(c.login_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+				</if>
+				<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+					and date_format(c.login_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+				</if>
+			</if>
+		</where>
+	</select>
+	
+	<delete id="deleteLogininforByIds" parameterType="String">
+ 		delete from sys_logininfor where info_id in
+ 		<foreach collection="array" item="infoId" open="(" separator="," close=")">
+ 			#{infoId}
+        </foreach> 
+ 	</delete>
+ 	
+ 	<update id="cleanLogininfor">
+        delete from sys_logininfor
+		<if test="deptId != null and deptId != 0 and deptId != 10">
+			where  dept_id = #{deptId} or  dept_id in (SELECT t.dept_id FROM sys_dept t where t.parent_id = #{deptId})
+		</if>
+    </update>
+</mapper> 

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="warningDao">
+
+	<select id="getWarnningList" resultType="com.syn.smsp.vo.WarningVO">
+		select
+		sw.id,
+		case when ss.IMEI is null then sw.IMEI else ss.IMEI end as facilityCode,
+		ss.imei_name as facilityName,
+		sc.code_name as warning_type,
+		sw.warning_type as warning_code,
+		sw.warning_dis,
+			(select count(1) from sys_warning_log where IMEI = facilityCode and warning_type = sw.warning_type
+				<if test="params != null and params.beginTime != null and params.beginTime.trim() != '' and params.endTime != null and params.endTime.trim() != ''">  and `create_time` between #{params.beginTime} and  #{params.endTime} </if>
+			) as count,
+		sd.dept_name,
+		ss.sensor_location,
+		MIN(sw.create_time) as create_time,
+		MAX(sw.update_time) as update_time,
+		sw.status
+		from sys_warning sw
+		left join sys_sensor ss on sw.IMEI = ss.IMEI
+		join sys_code sc on sw.warning_type = sc.code_key
+		left join sys_dept sd on ss.dept_id = sd.dept_id
+		<where>
+			<if test="deptId != null and deptId != 0">
+				AND  (ss.dept_id = #{deptId} or ss.dept_id in (SELECT t.dept_id FROM sys_dept t where t.parent_id = #{deptId}))
+			</if>
+			<if test="facilityName != null and facilityName.trim() != ''">and ss.imei_name like #{facilityName} </if>
+			<if test="status != null and status.trim() != ''">and sw.status = #{status} </if>
+			<if test="params != null and params.beginTime != null and params.beginTime.trim() != '' and params.endTime != null and params.endTime.trim() != ''">  and sw.`create_time` between #{params.beginTime} and  #{params.endTime} </if>
+		</where>
+		group by facilityCode,warning_type
+		order by sw.update_time desc
+	</select>
+
+	<select id="getWarnningByIMEI" resultType="com.syn.smsp.vo.WarningVO">
+		select *
+		from sys_warning
+		where IMEI = #{IMEI}
+		and warning_type = #{alarmStatus}
+-- 		and TO_DAYS(create_time) = to_days(now())
+		order by update_time desc
+		limit 1
+	</select>
+
+	<insert id="saveWarning">
+		insert into sys_warning
+		(
+			IMEI,
+			warning_type,
+			`count`,
+			status,
+			create_time,
+			update_time
+		)
+		values
+		(
+			#{IMEI},
+			#{alarmStatus},
+			1,
+			#{status},
+			sysdate(),
+			sysdate()
+		)
+	</insert>
+
+	<insert id="saveWarningLog">
+		insert into sys_warning_log
+		(
+			IMEI,
+			warning_type,
+			create_time,
+			update_time
+		)
+		values
+		(
+			#{IMEI},
+			#{alarmStatus},
+			sysdate(),
+			sysdate()
+		)
+	</insert>
+
+	<update id="updateWarning" parameterType="com.syn.smsp.vo.SirenWarningVO">
+		update sys_warning
+		set warning_dis = '',`count` = `count`+1,update_time = sysdate(),status = #{status}
+		where IMEI = #{IMEI}
+		and warning_type = #{alarmStatus}
+-- 		and TO_DAYS(create_time) = to_days(now())
+	</update>
+
+	<update id="updateStatus" parameterType="Map">
+		update sys_warning
+		<set>
+			<if test="warningDis != null and warningDis != ''">warning_dis = #{warningDis},</if>
+			status = 1,update_time = sysdate()
+		</set>
+		where id in
+		<if test="ids!=null and ids.length>0">
+			<foreach collection="ids" item="id" open="(" separator="," close=")">
+				#{id}
+			</foreach>
+		</if>
+	</update>
+
+	<update id="updateLogStatus" parameterType="Map">
+		update sys_warning_log
+		set warning_dis = #{warningDis}
+		where IMEI = (select IMEI from sys_warning where id = #{longId})
+		and warning_type = (select warning_type from sys_warning where id = #{longId})
+		and TIMESTAMPDIFF(SECOND,create_time,(select update_time from sys_warning where id = #{longId})) = 0
+	</update>
+
+
+    <select id="getWarnningLogList" resultType="com.syn.smsp.vo.WarningVO">
+		select
+		sw.id,
+		case when ss.IMEI is null then sw.IMEI else ss.IMEI end as facilityCode,
+		ss.imei_name as facilityName,
+		sc.code_name as warning_type,
+		sw.warning_type as warning_code,
+		sw.warning_dis,
+		sd.dept_name,
+		ss.sensor_location,
+		sw.create_time,
+		sw.update_time
+		from sys_warning_log sw
+		left join sys_sensor ss on sw.IMEI = ss.IMEI
+		join sys_code sc on sw.warning_type = sc.code_key
+		left join sys_dept sd on ss.dept_id = sd.dept_id
+        <where>
+            <if test="facilityCode != null and facilityCode.trim() != ''">and sw.IMEI = #{facilityCode} </if>
+            <if test="warningCode != null and warningCode.trim() != ''">
+                AND  sw.warning_type = #{warningCode}
+            </if>
+            <if test="params != null and params.beginTime != null and params.beginTime.trim() != '' and params.endTime != null and params.endTime.trim() != ''">  and sw.`create_time` between #{params.beginTime} and  #{params.endTime} </if>
+        </where>
+        group by sw.id
+		order by sw.create_time desc
+    </select>
+	<select id="selectWarnningStatus" resultType="com.syn.smsp.vo.WarningVO">
+
+		SELECT
+		 (SELECT COUNT(1) FROM sys_warning  WHERE `status`=0) AS callNum,
+		 (SELECT COUNT(1) FROM sys_warning  WHERE `warning_type` = 7) AS normalNum,
+		 (SELECT COUNT(1) FROM sys_sensor  WHERE `running_state`=0) AS onlineNum,
+		 (SELECT COUNT(1) FROM sys_sensor  WHERE `running_state`=1) AS faultNum,
+		 (SELECT COUNT(1) FROM sys_warning  WHERE `status`=0 AND warning_type = 4) AS lowtensionNum,
+		 (SELECT COUNT(1) FROM sys_warning  WHERE `status`=0 AND warning_type = 10) AS teardownNum
+	</select>
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        <!--namespace="RoleDao"-->
+<mapper namespace="smsSendingLogDao">
+
+    <insert id="save" parameterType="com.syn.smsp.vo.SMSSendingLogVO">
+        insert into sms_sending_log( 
+        <if test="module != null and module != ''">module,</if>
+        <if test="account != null and account != ''">account,</if>
+        <if test="password != null and password != ''">password,</if>
+        <if test="msg != null and msg != ''">msg,</if>
+        <if test="params != null and params != ''">params,</if>
+        <if test="requestUrl != null and requestUrl != ''">request_url,</if>
+        <if test="reportStatus != null and reportStatus != ''">report_status,</if>
+        <if test="msgId != null and msgId != 0">msg_id,</if>
+        <if test="responseTime != null and responseTime != ''">response_time,</if>
+        <if test="status != null and status != ''">status,</if>
+        <if test="responseMsg != null and responseMsg != ''">response_msg,</if>
+        <if test="failNum != null and failNum != 0">failNum,</if>
+        <if test="successNum != null and successNum != 0">successNum,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        )values( 
+        <if test="module != null and module != ''">#{module},</if>
+        <if test="account != null and account != ''">#{account},</if>
+        <if test="password != null and password != ''">#{password},</if>
+        <if test="msg != null and msg != ''">#{msg},</if>
+        <if test="params != null and params != ''">#{params},</if>
+        <if test="requestUrl != null and requestUrl != ''">#{requestUrl},</if>
+        <if test="reportStatus != null and reportStatus != ''">#{reportStatus},</if>
+        <if test="msgId != null and msgId != 0">#{msgId},</if>
+        <if test="responseTime != null and responseTime != ''">#{responseTime},</if>
+        <if test="status != null and status != ''">#{status},</if>
+        <if test="responseMsg != null and responseMsg != ''">#{responseMsg},</if>
+        <if test="failNum != null and failNum != 0">#{failNum},</if>
+        <if test="successNum != null and successNum != 0">#{successNum},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+    <select id="selectSMSSendingLogList"  resultType="com.syn.smsp.vo.SMSSendingLogVO">
+        SELECT
+        id, module, account, password, msg, params, status, failNum, successNum,
+        request_url as requestUrl,
+        report_status as reportStatus,
+        msg_id as msgId,
+        response_time as responseTime,
+        response_msg as responseMsg,
+        create_by as createBy,
+        create_time as createTime
+        FROM sms_sending_log
+        <where>
+            <if test="status != null and status.trim() != ''">
+                AND  status = #{status}
+            </if>
+            <if test="module != null and module.trim() != ''">
+                AND  module = #{module}
+            </if>
+            <if test="mapParams != null and mapParams.size() > 0">
+                <if test="mapParams.beginTime != null and mapParams.beginTime != ''"><!-- 开始时间检索 -->
+                    AND date_format(response_time,'%y%m%d') &gt;= date_format(#{mapParams.beginTime},'%y%m%d')
+                </if>
+                <if test="mapParams.endTime != null and mapParams.endTime != ''"><!-- 结束时间检索 -->
+                    AND date_format(response_time,'%y%m%d') &lt;= date_format(#{mapParams.endTime},'%y%m%d')
+                </if>
+            </if>
+        </where>
+        order by id
+    </select>
+
+</mapper>

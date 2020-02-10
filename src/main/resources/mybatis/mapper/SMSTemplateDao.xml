@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="smsTemplateDao">
+
+	<insert id="insertSMSTemplate" parameterType="com.syn.smsp.vo.SMSTemplateVO" useGeneratedKeys="true"  keyProperty="id"> 
+		insert into sys_sms_template( 
+		<if test="mobile != null and mobile != ''">mobile,</if>
+		<if test="module != null and module != ''">module,</if>
+		<if test="templateMsg != null and templateMsg != ''">template_msg,</if>
+		<if test="variable != null and variable != ''">variable,</if>
+		<if test="status != null">status,</if>
+		<if test="createBy != null and createBy != ''">create_by,</if>
+		create_time
+		)values( 
+		<if test="mobile != null and mobile != ''">#{mobile},</if>
+		<if test="module != null and module != ''">#{module},</if>
+		<if test="templateMsg != null and templateMsg != ''">#{templateMsg},</if>
+		<if test="variable != null and variable != ''">#{variable},</if>
+		<if test="status != null">#{status},</if>
+		<if test="createBy != null and createBy != ''">#{createBy},</if>
+		sysdate()
+		)
+	</insert>
+
+
+	<select id="selectSMSTemplate"  resultType="com.syn.smsp.vo.SMSTemplateVO">
+		SELECT   id,mobile,variable,module,status,
+		template_msg as template_msg,
+		create_by as createBy,
+		create_time as createTime,
+		update_by as updateBy,
+		update_time as updateTime
+		FROM sys_sms_template
+		<where>
+			<if test="id != null and id != null">
+				AND  id = #{id}
+			</if>
+			<if test="mobile != null and mobile.trim() != ''">
+				AND  mobile = #{mobile}
+			</if>
+			<if test="module != null and module.trim() != ''">
+				AND  module = #{module}
+			</if>
+			<if test="status != null and status != null">
+				AND  status = #{status}
+			</if>
+			<if test="createBy != null and createBy.trim() != ''">
+				AND  create_by = #{createBy}
+			</if>
+		</where>
+		order by id
+	</select>
+	<update id="updateSMSTemplate"  parameterType="com.syn.smsp.vo.SMSTemplateVO">
+		update sys_sms_template
+		<set>
+			<if test="mobile != null and mobile != ''">mobile = #{mobile},</if>
+			<if test="module != null and module != ''">module = #{module},</if>
+			<if test="templateMsg != null and templateMsg != ''">template_msg = #{templateMsg},</if>
+			<if test="variable != null and variable != ''">variable = #{variable},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = sysdate()
+		</set>
+		where id = #{id}
+	</update>
+
+	<update id="updateSMSTemplateStatus"  parameterType="com.syn.smsp.vo.SMSTemplateVO">
+		update sys_sms_template set status = 0,update_by = #{updateBy},update_time = sysdate()
+		where id != #{id} and  status = 1
+	</update>
+
+	<delete id="deleteSMSTemplateByIds" parameterType="Long">
+		delete from sys_sms_template where id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

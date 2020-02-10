@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sysSensorDao">
+
+
+    <insert id="registerMsg" parameterType="com.syn.smsp.vo.SensorVO" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_sensor(
+        <if test="IMEI != null and IMEI != ''">imei,</if>
+        <if test="masgID != null and masgID != ''">masg_id,</if>
+        <if test="manufacturer != null and manufacturer != ''">manufacturer,</if>
+        <if test="deviceType != null and deviceType != ''">device_type,</if>
+        <if test="IMSI != null and IMSI != ''">IMSI,</if>
+        <if test="hardwareVersion != null and hardwareVersion != ''">hardware_version,</if>
+        <if test="firmwareVersion != null and firmwareVersion != ''">firmware_version,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        heartbeat,
+        create_time
+        )values(
+        <if test="IMEI != null and IMEI != ''">#{IMEI},</if>
+        <if test="masgID != null and masgID != ''">#{masgID},</if>
+        <if test="manufacturer != null and manufacturer != ''">#{manufacturer},</if>
+        <if test="deviceType != null and deviceType != ''">#{deviceType},</if>
+        <if test="IMSI != null and IMSI != ''">#{IMSI},</if>
+        <if test="hardwareVersion != null and hardwareVersion != ''">#{hardwareVersion},</if>
+        <if test="firmwareVersion != null and firmwareVersion != ''">#{firmwareVersion},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate(),
+        sysdate()
+        )
+    </insert>
+
+
+    <insert id="insertSensor" parameterType="com.syn.smsp.vo.SysSensorVO" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_sensor(
+        <if test="IMEI != null and IMEI != ''">imei,</if>
+        <if test="imeiName != null and imeiName != ''">imei_name,</if>
+        <if test="phone != null and phone != ''">phone,</if>
+        <if test="sensorAccounts != null and sensorAccounts != ''">sensor_accounts,</if>
+        <if test="sensorPassword != null and sensorPassword != ''">sensor_password,</if>
+        <if test="state != null and state != ''">state,</if>
+        <if test="runningState != null and runningState != ''">running_state,</if>
+        <if test="masgID != null and masgID != ''">masg_id,</if>
+        <if test="manufacturer != null and manufacturer != ''">manufacturer,</if>
+        <if test="deviceType != null and deviceType != ''">device_type,</if>
+        <if test="IMSI != null and IMSI != ''">IMSI,</if>
+        <if test="hardwareVersion != null and hardwareVersion != ''">hardware_version,</if>
+        <if test="firmwareVersion != null and firmwareVersion != ''">firmware_version,</if>
+        <if test="sensorType != null and sensorType != ''">sensor_type,</if>
+        <if test="maintenance != null and maintenance != 0">maintenance,</if>
+        heartbeat,
+        <if test="video != null and video != ''">video,</if>
+        <if test="XCoordinates != null and XCoordinates != ''">x_coordinates,</if>
+        <if test="YCoordinates != null and YCoordinates != ''">y_coordinates,</if>
+        <if test="sensorLocation != null and sensorLocation != ''">sensor_location,</if>
+        <if test="sensorPicture != null and sensorPicture != ''">sensor_picture,</if>
+        <if test="userId != null and userId != ''">user_id,</if>
+        <if test="deptId != null and deptId != ''">dept_id,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        <if test="remark != null and remark != ''">remark,</if>
+        create_time
+        )values(
+        <if test="IMEI != null and IMEI != ''">#{IMEI},</if>
+        <if test="imeiName != null and imeiName != ''">#{imeiName},</if>
+        <if test="phone != null and phone != ''">#{phone},</if>
+        <if test="sensorAccounts != null and sensorAccounts != ''">#{sensorAccounts},</if>
+        <if test="sensorPassword != null and sensorPassword != ''">#{sensorPassword},</if>
+        <if test="state != null and state != ''">#{state},</if>
+        <if test="runningState != null and runningState != ''">#{runningState},</if>
+        <if test="masgID != null and masgID != ''">#{masgID},</if>
+        <if test="manufacturer != null and manufacturer != ''">#{manufacturer},</if>
+        <if test="deviceType != null and deviceType != ''">#{deviceType},</if>
+        <if test="IMSI != null and IMSI != ''">#{IMSI},</if>
+        <if test="hardwareVersion != null and hardwareVersion != ''">#{hardwareVersion},</if>
+        <if test="firmwareVersion != null and firmwareVersion != ''">#{firmwareVersion},</if>
+        <if test="sensorType != null and sensorType != ''">#{sensorType},</if>
+        <if test="maintenance != null and maintenance != ''">#{maintenance},</if>
+        sysdate(),
+        <if test="video != null and video != ''">#{video},</if>
+        <if test="XCoordinates != null and XCoordinates != ''">#{XCoordinates},</if>
+        <if test="YCoordinates != null and YCoordinates != ''">#{YCoordinates},</if>
+        <if test="sensorLocation != null and sensorLocation != ''">#{sensorLocation},</if>
+        <if test="sensorPicture != null and sensorPicture != ''">#{sensorPicture},</if>
+        <if test="userId != null and userId != ''">#{userId},</if>
+        <if test="deptId != null and deptId != ''">#{deptId},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+
+    <update id="updateSensor" parameterType="com.syn.smsp.vo.SysSensorVO">
+        update sys_sensor
+        <set>
+            <if test="imeiName != null and imeiName != ''">imei_name = #{imeiName},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="sensorAccounts != null and sensorAccounts != ''">sensor_accounts = #{sensorAccounts},</if>
+            <if test="sensorPassword != null and sensorPassword != ''">sensor_password = #{sensorPassword},</if>
+            <if test="state != null and state != ''">state = #{state},</if>
+            <if test="runningState != null and runningState != ''">running_state = #{runningState},</if>
+            <if test="masgID != null and masgID != ''">masg_id = #{masgID},</if>
+            <if test="manufacturer != null and manufacturer != ''">manufacturer = #{manufacturer},</if>
+            <if test="deviceType != null and deviceType != ''">device_type = #{deviceType},</if>
+            <if test="IMSI != null and IMSI != ''">IMSI = #{IMSI},</if>
+            <if test="hardwareVersion != null and hardwareVersion != ''">hardware_version = #{hardwareVersion},</if>
+            <if test="firmwareVersion != null and firmwareVersion != ''">firmware_version = #{firmwareVersion},</if>
+            <if test="sensorType != null and sensorType != ''">sensor_type = #{sensorType},</if>
+            <if test="maintenance != null and maintenance != 0">maintenance = #{maintenance},</if>
+            <if test="heartbeat != null and heartbeat != 0">heartbeat = #{heartbeat},</if>
+            <if test="video != null and video != ''">video = #{video},</if>
+            <if test="XCoordinates != null and XCoordinates != ''">x_coordinates = #{XCoordinates},</if>
+            <if test="YCoordinates != null and YCoordinates != ''">y_coordinates = #{YCoordinates},</if>
+            <if test="sensorLocation != null and sensorLocation != ''">sensor_location = #{sensorLocation},</if>
+            <if test="sensorPicture != null and sensorPicture != ''">sensor_picture = #{sensorPicture},</if>
+            <if test="userId != null and userId != ''">user_id = #{userId},</if>
+            <if test="deptId != null and deptId != ''">dept_id = #{deptId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null and remark != ''">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where IMEI = #{IMEI}
+    </update>
+
+    <update id="updateSensorByIMEI" parameterType="com.syn.smsp.vo.SysSensorVO">
+        update sys_sensor
+        set state = #{alarmStatus}
+        where IMEI = #{IMEI}
+    </update>
+
+    <update id="heartbeatByIMEI" parameterType="com.syn.smsp.vo.SirenWarningVO">
+        update sys_sensor
+        <set>
+            <if test="batteryLevel != null and batteryLevel != ''">battery_Level = #{batteryLevel},</if>
+            <if test="alarmLevel != null and alarmLevel != ''">alarm_Level = #{alarmLevel},</if>
+            heartbeat = sysdate()
+        </set>
+        where IMEI = #{IMEI}
+    </update>
+
+
+    <select id="selectSensorList" resultType="com.syn.smsp.vo.SysSensorVO">
+        SELECT se.id,se.IMEI,se.imei_name,se.sensor_location,se.sensor_type,se.running_state,se.create_time,
+        (SELECT dep.dept_name from sys_dept dep WHERE dep.dept_id=se.dept_id) as deptName,
+        (SELECT sc.code_name from sys_code sc WHERE sc.code_key=(SELECT sw.warning_type FROM sys_warning sw
+        WHERE sw.IMEI = se.IMEI ORDER BY sw.update_time DESC LIMIT 1) ) as state,se.battery_Level,se.alarm_Level
+        from sys_sensor se
+        <where>
+            <if test="IMEI != null and IMEI.trim() != ''">
+                AND se.IMEI = #{IMEI}
+            </if>
+            <if test="imeiName != null and imeiName.trim() != ''">
+                AND se.imei_name = #{imeiName}
+            </if>
+            <if test="state != null and state.trim() != ''">
+                AND se.state = #{state}
+            </if>
+            <if test="runningState != null and runningState.trim() != ''">
+                AND se.running_state = #{runningState}
+            </if>
+            <if test="deptId != null and deptId.trim() != ''">
+                AND (se.dept_id = #{deptId} or se.dept_id in (SELECT t.dept_id FROM sys_dept t where t.parent_id =
+                #{deptId}))
+            </if>
+            <if test="createBy != null and createBy.trim() != ''">
+                AND se.create_by = #{createBy}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAlarmList" parameterType="java.util.List" resultType="com.syn.smsp.vo.SysSensorVO">
+        SELECT c.x_coordinates,c.y_coordinates,
+           (SELECT dic.dict_value FROM sys_dict_data dic WHERE dic.dict_type='device_type' AND dic.dict_label=c.device_type) as device_type,
+            c.IMEI,c.imei_name,c.sensor_location,
+            (SELECT dic.dict_value FROM sys_dict_data dic WHERE dic.dict_type='running_state' AND dic.dict_label=c.running_state) as running_state,
+            (SELECT (SELECT sc.code_name from sys_code sc WHERE sc.code_key = sw.warning_type)   FROM sys_warning sw  WHERE sw.IMEI =c.IMEI
+            and sw.status='0' ORDER BY sw.create_time desc LIMIT 1) as state,
+            (SELECT sw.create_time FROM sys_warning sw  WHERE sw.IMEI = c.IMEI and sw.status='0' ORDER BY sw.create_time desc LIMIT 1) as wUpdateTime
+        FROM sys_sensor c
+        WHERE c.IMEI in (SELECT sw.IMEI FROM sys_warning sw where  sw.status='0' GROUP BY sw.IMEI)
+        <if test="sensorLocation != null and sensorLocation != ''">
+            AND c.sensor_location like concat('%', #{sensorLocation}, '%')
+        </if>
+    </select>
+    <select id="selectSensorById" resultType="com.syn.smsp.vo.SysSensorVO">
+         select  c.*,(SELECT t.dept_name FROM sys_dept t where t.dept_id=c.dept_id) as dept_name  from  sys_sensor  c
+         where c.imei = #{IMEI}
+    </select>
+
+    <select id="queryByIMEI" parameterType="String" resultType="com.syn.smsp.vo.SysSensorVO">
+		select * from sys_sensor where IMEI = #{value}
+	</select>
+
+
+    <delete id="deleteSensorByIds" parameterType="Long">
+        delete from sys_sensor where imei in
+        <foreach collection="array" item="imei" open="(" separator="," close=")">
+            #{imei}
+        </foreach>
+    </delete>
+
+    <select id="alarmOnLine" resultType="com.syn.smsp.vo.SysSensorVO">
+      select  c.* from sys_sensor c
+       where  c.running_state = #{runningState}
+         AND unix_timestamp(now())-unix_timestamp(heartbeat) &gt; 86400;
+    </select>
+
+    <select id="alarmOffline" resultType="com.syn.smsp.vo.SysSensorVO">
+      select  c.* from sys_sensor c
+       where  c.running_state = #{runningState}
+         AND unix_timestamp(now())-unix_timestamp(heartbeat) &lt;= 86400;
+    </select>
+    <update id="updateRunningState" parameterType="int">
+        update sys_sensor
+        <if test="value == 1">
+            set running_state=1 where running_state = 0
+            AND unix_timestamp(now())-unix_timestamp(heartbeat) &gt; 86400;
+        </if>
+        <if test="value == 0">
+            set running_state=0 where running_state = 1
+            AND unix_timestamp(now())-unix_timestamp(heartbeat) &lt;= 86400;
+        </if>
+    </update>
+
+</mapper>

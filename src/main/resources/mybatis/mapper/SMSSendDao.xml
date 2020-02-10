@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="smsSendDao">
+
+	<insert id="insertSMSSend" parameterType="com.syn.smsp.vo.SMSSendVO" useGeneratedKeys="true"  keyProperty="id"> 
+		insert into sys_sms_send( 
+		<if test="account != null and account != ''">account,</if>
+		<if test="password != null and password != ''">password,</if>
+		<if test="smsVariableRequestUrl != null and smsVariableRequestUrl != ''">sms_variable_request_url,</if>
+		<if test="status != null">status,</if>
+		<if test="smsTemplateId != null">template_id,</if>
+		<if test="createBy != null and createBy != ''">create_by,</if>
+		create_time
+		)values( 
+		<if test="account != null and account != ''">#{account},</if>
+		<if test="password != null and password != ''">#{password},</if>
+		<if test="smsVariableRequestUrl != null and smsVariableRequestUrl != ''">#{smsVariableRequestUrl},</if>
+		<if test="status != null">#{status},</if>
+		<if test="smsTemplateId != null and smsTemplateId != 0">#{smsTemplateId},</if>
+		<if test="createBy != null and createBy != ''">#{createBy},</if>
+		sysdate()
+		)
+	</insert>
+
+	<select id="selectSMSSend"  resultType="com.syn.smsp.vo.SMSSendVO">
+		SELECT   id,account,password,status,
+		sms_variable_request_url as smsVariableRequestUrl,
+		template_id as smsTemplateId,
+		(SELECT c.module FROM sys_sms_template c WHERE c.id = template_id) as smsTemplateName,
+		create_by as createBy,
+		create_time as createTime,
+		update_by as updateBy,
+		update_time as updateTime
+		FROM sys_sms_send
+		<where>
+			<if test="id != null and id != null">
+				AND  id = #{id}
+			</if>
+			<if test="account != null and account.trim() != ''">
+				AND  account = #{account}
+			</if>
+			<if test="smsTemplateName != null and smsTemplateName.trim() != ''">
+				AND  template_id = (SELECT b.id FROM sys_sms_template b WHERE b.module like concat('%', #{smsTemplateName}, '%')  and b.status='1')
+			</if>
+			<if test="smsVariableRequestUrl != null and smsVariableRequestUrl.trim() != ''">
+			AND  sms_variable_request_url = #{smsVariableRequestUrl}
+			</if>
+			<if test="status != null and status != null">
+				AND  status = #{status}
+			</if>
+			<if test="createBy != null and createBy.trim() != ''">
+				AND  create_by = #{createBy}
+			</if>
+		</where>
+		order by "id"
+	</select>
+
+	<update id="updateSMSSend"  parameterType="com.syn.smsp.vo.SMSSendVO">
+		update sys_sms_send
+		<set>
+			<if test="account != null and account != ''">account = #{account},</if>
+			<if test="password != null and password != ''">password = #{password},</if>
+			<if test="smsVariableRequestUrl != null and smsVariableRequestUrl != ''">sms_variable_request_url = #{smsVariableRequestUrl},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="smsTemplateId != null and smsTemplateId != 0">template_id = #{smsTemplateId},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = sysdate()
+		</set>
+		where id = #{id}
+	</update>
+
+	<update id="updateSMSSendStatus"  parameterType="com.syn.smsp.vo.SMSSendVO">
+		update sys_sms_send set status = '0',  update_by = #{updateBy}, update_time = sysdate()
+		where id != #{id}  and  status = '1'
+	</update>
+
+	<delete id="deleteSMSSendByIds" parameterType="Long">
+		delete from sys_sms_send where id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

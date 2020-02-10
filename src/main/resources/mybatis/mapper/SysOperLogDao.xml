@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sysOperLogDao">
+
+	<insert id="insertOperlog" parameterType="com.syn.smsp.vo.SysOperLogVO" useGeneratedKeys="true" keyProperty="roleId">
+		insert into sys_oper_log(
+				title,
+				business_type,
+				method,
+				operator_type,
+				oper_name,
+				dept_id,
+				oper_url,
+				oper_ip,
+				oper_location,
+				oper_param,
+				status,
+				error_msg,
+				oper_time
+		)values (
+				#{title},
+				#{businessType},
+				#{method},
+				#{operatorType},
+				#{operName},
+				 #{deptId},
+				 #{operUrl},
+				 #{operIp},
+				 #{operLocation},
+				 #{operParam},
+				 #{status},
+				  #{errorMsg},
+				  sysdate()
+			  )
+		</insert>
+
+	<sql id="selectOperLogVo">
+        select oper_id, title, business_type, method, operator_type, oper_name, dept_id,
+          (SELECT t.dept_name from sys_dept t where t.dept_id = c.dept_id) as dept_name,
+         oper_url, oper_ip, oper_location, oper_param, status, error_msg, oper_time
+        from sys_oper_log c
+    </sql>
+	
+	<select id="selectOperLogList" resultType="com.syn.smsp.vo.SysOperLogVO">
+		<include refid="selectOperLogVo"/>
+		<where>
+			<if test="deptId != null and deptId != 0">
+				AND (c.dept_id = #{deptId} or c.dept_id in (SELECT t.dept_id FROM sys_dept t where t.parent_id = #{deptId}))
+			</if>
+			<if test="title != null and title.trim() != ''">
+				AND c.title like concat('%', #{title}, '%')
+			</if>
+			<if test="businessType != null and businessType != ''">
+				AND c.business_type = #{businessType}
+			</if>
+			<if test="businessTypes != null and businessTypes.length > 0">
+			    AND c.business_type in
+			    <foreach collection="businessTypes" item="businessType" open="(" separator="," close=")">
+		 			#{businessType}
+		        </foreach> 
+			</if>
+			<if test="status != null">
+				AND c.status = #{status}
+			</if>
+			<if test="operName != null and operName.trim() != ''">
+				AND c.oper_name = #{operName}
+			</if>
+            <if test="params != null and params.size() > 0">
+                <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(c.oper_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+                <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                    and date_format(c.oper_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+                </if>
+            </if>
+		</where>
+	</select>
+
+	<select id="selectOperLogById" resultType="com.syn.smsp.vo.SysOperLogVO">
+		<include refid="selectOperLogVo"/>
+		where oper_id = #{operId}
+	</select>
+
+	<delete id="deleteOperLogByIds" parameterType="String">
+ 		delete from sys_oper_log where oper_id in
+ 		<foreach collection="array" item="operId" open="(" separator="," close=")">
+ 			#{operId}
+        </foreach> 
+ 	</delete>
+
+	<update id="cleanOperLog">
+       delete from sys_oper_log
+		<if test="deptId != null and deptId != 0 and deptId != 10">
+			where  dept_id = #{deptId} or  dept_id in (SELECT t.dept_id FROM sys_dept t where t.parent_id = #{deptId})
+		</if>
+    </update>
+</mapper> 

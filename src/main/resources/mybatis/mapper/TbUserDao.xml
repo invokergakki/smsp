@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tbUserDao">
+
+    <insert id="insertTbUser" parameterType="com.syn.smsp.vo.TbUserVO" useGeneratedKeys="true" keyProperty="userId">
+        insert into tb_user(
+        <if test="userId != null and userId != 0">user_id,</if>
+        <if test="userName != null and userName != ''">user_name,</if>
+        <if test="password != null and password != ''">password,</if>
+        <if test="mobile != null and mobile != ''">mobile,</if>
+        <if test="token != null and token != ''">token,</if>
+        create_time
+        )values(
+        <if test="userId != null and userId != 0">#{userId},</if>
+        <if test="userName != null and userName != ''">#{userName},</if>
+        <if test="password != null and password != ''">#{password},</if>
+        <if test="mobile != null and mobile != ''">#{mobile},</if>
+        <if test="token != null and token != ''">#{token},</if>
+        sysdate()
+        )
+    </insert>
+
+
+    <select id="selectTbUserList" resultType="com.syn.smsp.vo.TbUserVO">
+        SELECT user_id,user_name,password,mobile,token,create_time FROM tb_user
+        <where>
+            <if test="userId != null and userId !=0">
+                AND user_id = #{userId}
+            </if>
+            <if test="userName != null and userName.trim() != ''">
+                AND user_name like concat('%', #{userName}, '%')
+            </if>
+            <if test="password != null and password.trim() != ''">
+                AND password = #{password}
+            </if>
+            <if test="mobile != null and mobile.trim() != ''">
+                AND mobile = #{mobile}
+            </if>
+            <if test="token != null and token.trim() != ''">
+                AND token = #{token}
+            </if>
+        </where>
+    </select>
+
+
+    <update id="updateTbUser" parameterType="com.syn.smsp.vo.TbUserVO">
+        update tb_user
+        <set>
+            <if test="userId != null and userId != 0">  user_id = #{userId},</if>
+            <if test="userName != null and userName != ''"> user_name = #{username},</if>
+            <if test="password != null and password.trim() != ''"> password = #{password}, </if>
+            <if test="mobile != null and mobile.trim() != ''"> mobile = #{mobile},</if>
+            <if test="token != null and token.trim() != ''"> token = #{token}</if>
+        </set>
+        where user_id = #{userId}
+    </update>
+</mapper>
